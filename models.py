@@ -62,11 +62,22 @@ class Venue(db.Model):
 
     @property
     def get_venue_with_show_details(self):
-        upcoming_shows = Show.query.filter(Show.start_time > datetime.datetime.now(), Show.venue_id == self.id).all()
-        upcoming_shows_with_artist_venue = [show.show_with_artist_venue for show in upcoming_shows]
+        upcoming_shows = db.session.query(Artist, Show).join(Show).join(Venue).\
+            filter(
+                Show.start_time > datetime.datetime.now(),
+                Show.venue_id == self.id,
+                Show.artist_id == Artist.id
+            ).all()
+        upcoming_shows_with_artist_venue = [show.show_with_artist_venue for artist, show in upcoming_shows]
 
-        past_shows = Show.query.filter(Show.start_time < datetime.datetime.now(), Show.venue_id == self.id).all()
-        past_shows_with_artist_venue = [show.show_with_artist_venue for show in past_shows]
+        past_shows = db.session.query(Artist, Show).join(Show).join(Venue).\
+            filter(
+                Show.start_time < datetime.datetime.now(),
+                Show.venue_id == self.id,
+                Show.artist_id == Artist.id
+        ).all()
+        print(past_shows)
+        past_shows_with_artist_venue = [show.show_with_artist_venue for artist, show in past_shows]
         return {
             'id': self.id,
             'name': self.name,
@@ -144,11 +155,21 @@ class Artist(db.Model):
 
     @property
     def get_artist_with_show_details(self):
-        upcoming_shows = Show.query.filter(Show.start_time > datetime.datetime.now(), Show.artist_id == self.id).all()
-        upcoming_shows_with_artist_venue = [show.show_with_artist_venue for show in upcoming_shows]
+        upcoming_shows = db.session.query(Artist, Show).join(Show).join(Venue). \
+            filter(
+            Show.start_time > datetime.datetime.now(),
+            Show.venue_id == Venue.id,
+            Show.artist_id == self.id
+        ).all()
+        upcoming_shows_with_artist_venue = [show.show_with_artist_venue for artist, show in upcoming_shows]
 
-        past_shows = Show.query.filter(Show.start_time < datetime.datetime.now(), Show.artist_id == self.id).all()
-        past_shows_with_artist_venue = [show.show_with_artist_venue for show in past_shows]
+        past_shows = db.session.query(Artist, Show).join(Show).join(Venue). \
+            filter(
+            Show.start_time < datetime.datetime.now(),
+            Show.venue_id == Venue.id,
+            Show.artist_id == self.id
+        ).all()
+        past_shows_with_artist_venue = [show.show_with_artist_venue for artist, show in past_shows]
         return {
             'id': self.id,
             'name': self.name,

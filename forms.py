@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, ValidationError
 from wtforms.validators import DataRequired, AnyOf, URL, Regexp
 
@@ -88,7 +88,7 @@ def validate_state(form, field):
     if field.data not in states_choices:
         raise ValidationError("Invalid state choice")
 
-class ShowForm(Form):
+class ShowForm(FlaskForm):
     artist_id = StringField(
         'artist_id'
     )
@@ -101,7 +101,7 @@ class ShowForm(Form):
         default= datetime.today()
     )
 
-class VenueForm(Form):
+class VenueForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
@@ -136,7 +136,7 @@ class VenueForm(Form):
     seeking_talent = BooleanField('seeking_talent')
     seeking_description = StringField('seeking_description')
 
-class ArtistForm(Form):
+class ArtistForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )

@@ -6,12 +6,19 @@ import sys
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for, abort
+from flask import (
+  Flask,
+  render_template,
+  request,
+  Response,
+  flash,
+  redirect,
+  url_for,
+  abort
+)
 from flask_moment import Moment
-from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
 from models import db, Artist, Venue, Show
@@ -136,19 +143,8 @@ def create_venue_submission():
   # TODO: modify data to be the data object returned from db insertion
   form = VenueForm(request.form)
   try:
-    venue = Venue(
-      name=form.name.data,
-      genres=','.join(form.genres.data),
-      address=form.address.data,
-      city=form.city.data,
-      state=form.state.data,
-      phone=form.phone.data,
-      facebook_link=form.facebook_link.data,
-      image_link=form.image_link.data,
-      website = form.website.data,
-      seeking_talent = form.seeking_talent.data,
-      seeking_description=form.seeking_description.data
-    )
+    venue = Venue()
+    form.populate_obj(venue)
 
     venue.add()
     # on successful db insert, flash success
@@ -342,18 +338,8 @@ def create_artist_submission():
 
   form = ArtistForm(request.form)
   try:
-    artist = Artist(
-      name=form.name.data,
-      genres=','.join(form.genres.data),
-      city=form.city.data,
-      state=form.state.data,
-      phone=form.phone.data,
-      facebook_link=form.facebook_link.data,
-      image_link=form.image_link.data,
-      website=form.website.data,
-      seeking_venue=form.seeking_venue.data,
-      seeking_description=form.seeking_description.data
-    )
+    artist = Artist()
+    form.populate_obj(artist)
 
     artist.add()
     # on successful db insert, flash success
