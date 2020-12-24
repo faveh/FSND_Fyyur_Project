@@ -124,7 +124,7 @@ def show_venue(venue_id):
   venue = Venue.query.filter(Venue.id == venue_id).one_or_none()
 
   # Hello reviewer, thank you for your detailed review. Please I do not understand what my task here is, because
-  # I already used JOIN in the `get_venue_with_show_details` and `get_artist_with_show_details` funtions
+  # I already used JOIN in the `get_venue_with_show_details` and `get_artist_with_show_details` functions
   # in models.py and I referenced these functions on line 136 and 278 below respectively.
   # I will be glad to receive more clarification from you.
   # Thank you for your time.
