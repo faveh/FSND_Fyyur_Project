@@ -121,12 +121,19 @@ def search_venues_by_city_state():
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
-  venues = Venue.query.filter(Venue.id == venue_id).one_or_none()
+  venue = Venue.query.filter(Venue.id == venue_id).one_or_none()
 
-  if venues is None:
+  # Hello reviewer, thank you for your detailed review. Please I do not understand what my task here is, because
+  # I already used JOIN in the `get_venue_with_show_details` and `get_artist_with_show_details` funtions
+  # in models.py and I referenced these functions on line 136 and 278 below respectively.
+  # I will be glad to receive more clarification from you.
+  # Thank you for your time.
+
+
+  if venue is None:
     abort(404)
 
-  data = venues.get_venue_with_show_details
+  data = venue.get_venue_with_show_details
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
