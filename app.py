@@ -53,6 +53,19 @@ def format_datetime(value, format='medium'):
 
 app.jinja_env.filters['datetime'] = format_datetime
 
+
+def show_with_artist_venue(show):
+  venues = Venue.query.filter(Venue.id == show.venue_id).one()
+  venue = venues.venue_details
+
+  artists = Artist.query.filter(Artist.id == show.artist_id).one()
+  artist = artists.artist_details
+  return {
+    'id': show.id,
+    'start_time': show.start_time.strftime("%m/%d/%Y, %H:%M:%S"),
+    'venue': venue,
+    'artist': artist,
+  }
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
@@ -123,17 +136,45 @@ def show_venue(venue_id):
   # TODO: replace with real venue data from the venues table, using venue_id
   venue = Venue.query.filter(Venue.id == venue_id).one_or_none()
 
-  # Hello reviewer, thank you for your detailed review. Please I do not understand what my task here is, because
-  # I already used JOIN in the `get_venue_with_show_details` and `get_artist_with_show_details` functions
-  # in models.py and I referenced these functions on line 136 and 278 below respectively.
-  # I will be glad to receive more clarification from you.
-  # Thank you for your time.
-
-
   if venue is None:
     abort(404)
 
-  data = venue.get_venue_with_show_details
+  upcoming_shows_details = db.session.query(Artist, Show).join(Show).join(Venue). \
+    filter(
+    Show.start_time > datetime.datetime.now(),
+    Show.venue_id == venue_id,
+    Show.artist_id == Artist.id
+  ).all()
+
+  upcoming_shows = [show_with_artist_venue(show) for artist, show in upcoming_shows_details]
+
+  past_show_details = db.session.query(Artist, Show).join(Show).join(Venue). \
+    filter(
+    Show.start_time < datetime.datetime.now(),
+    Show.venue_id == venue_id,
+    Show.artist_id == Artist.id
+  ).all()
+
+  past_shows = [show_with_artist_venue(show) for artist, show in past_show_details]
+
+  data = {
+    'id': venue.id,
+    'name': venue.name,
+    'city': venue.city,
+    'state': venue.state,
+    'phone': venue.phone,
+    'address': venue.address,
+    'image_link': venue.image_link,
+    'facebook_link': venue.facebook_link,
+    'seeking_talent': venue.seeking_talent,
+    'seeking_description': venue.seeking_description,
+    'website': venue.website,
+    'upcoming_shows': upcoming_shows,
+    'past_shows': past_shows,
+    'upcoming_shows_count': len(upcoming_shows_details),
+    'past_shows_count': len(past_show_details),
+    'genres': venue.genres.split(','),
+  }
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
@@ -270,12 +311,44 @@ def search_artists_by_city_state():
 def show_artist(artist_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
-  artists = Artist.query.filter(Artist.id == artist_id).one_or_none()
+  artist = Artist.query.filter(Artist.id == artist_id).one_or_none()
 
-  if artists is None:
+  if artist is None:
     abort(404)
 
-  data = artists.get_artist_with_show_details
+  upcoming_shows_details = db.session.query(Artist, Show).join(Show).join(Venue). \
+    filter(
+    Show.start_time > datetime.datetime.now(),
+    Show.venue_id == Venue.id,
+    Show.artist_id == artist_id
+  ).all()
+  upcoming_shows = [show_with_artist_venue(show) for artist, show in upcoming_shows_details]
+
+  past_show_details = db.session.query(Artist, Show).join(Show).join(Venue). \
+    filter(
+    Show.start_time < datetime.datetime.now(),
+    Show.venue_id == Venue.id,
+    Show.artist_id == artist_id
+  ).all()
+  past_shows = [show_with_artist_venue(show) for artist, show in past_show_details]
+
+  data = {
+    'id': artist.id,
+    'name': artist.name,
+    'city': artist.city,
+    'state': artist.state,
+    'phone': artist.phone,
+    'genres': artist.genres.split(','),
+    'image_link': artist.image_link,
+    'facebook_link': artist.facebook_link,
+    'seeking_venue': artist.seeking_venue,
+    'seeking_description': artist.seeking_description,
+    'website': artist.website,
+    'upcoming_shows': upcoming_shows,
+    'past_shows': past_shows,
+    'upcoming_shows_count': len(upcoming_shows_details),
+    'past_shows_count': len(past_show_details)
+  }
   print(data)
   return render_template('pages/show_artist.html', artist=data)
 
